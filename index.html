@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>直播手卡生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        
+        .input-panel {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .input-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #ff6b9d;
+        }
+        
+        .input-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b9d, #ff8fab);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .card-preview {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card-preview h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border: 3px solid #ff6b9d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 0 auto;
+        }
+        
+        .top-row {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .brand-box {
+            flex: 1;
+            border: 2px solid #333;
+            padding: 8px;
+            text-align: center;
+            background-color: #f8f8f8;
+        }
+        
+        .brand-label {
+            color: #ff6b9d;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .brand-text, .product-text {
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: center;
+            outline: none;
+            cursor: text;
+        }
+        
+        .product-box {
+            flex: 3;
+            border: 2px solid #333;
+            padding: 8px;
+            text-align: center;
+            background-color: #f8f8f8;
+        }
+        
+        .product-label {
+            color: #ff6b9d;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .middle-row {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .image-box {
+            flex: 2;
+            border: 2px solid #333;
+            padding: 20px;
+            text-align: center;
+            background-color: #f8f8f8;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-text {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .price-section {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .price-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .price-box {
+            flex: 1;
+            border: 2px solid #333;
+            padding: 8px;
+            text-align: center;
+            background-color: #f8f8f8;
+        }
+        
+        .price-label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .original-price {
+            color: #333;
+        }
+        
+        .live-price {
+            color: #ff6b9d;
+        }
+        
+        .discount {
+            color: #ff6b9d;
+        }
+        
+        .price-value {
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: center;
+            outline: none;
+            cursor: text;
+        }
+        
+        .info-box {
+            flex: 1;
+            border: 2px solid #333;
+            padding: 8px;
+            text-align: center;
+            background-color: #f8f8f8;
+            min-height: 60px;
+        }
+        
+        .info-label {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .mechanism {
+            color: #ff6b9d;
+        }
+        
+        .service {
+            color: #ff6b9d;
+        }
+        
+        .inventory {
+            color: #ff6b9d;
+        }
+        
+        .info-text {
+            font-size: 12px;
+            line-height: 1.3;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: center;
+            outline: none;
+            cursor: text;
+            min-height: 30px;
+            resize: none;
+        }
+        
+        .highlight-box {
+            border: 2px solid #333;
+            padding: 15px;
+            margin-top: 15px;
+            background-color: #f8f8f8;
+        }
+        
+        .highlight-label {
+            color: #ff6b9d;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .highlight-text {
+            font-size: 13px;
+            line-height: 1.4;
+            border: none;
+            background: transparent;
+            width: 100%;
+            outline: none;
+            cursor: text;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .export-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 输入面板 -->
+        <div class="input-panel">
+            <h2>📋 商品信息输入</h2>
+            <form id="productForm">
+                <div class="input-group">
+                    <label>商品信息（完整文本）:</label>
+                    <textarea id="productInfo" placeholder="请粘贴完整的商品信息文本，格式如：Smily mia辅食勺 Smily mia 69 58.65 25% 无 运费险,七天无理由 产品描述..."></textarea>
+                </div>
+                <button type="button" class="generate-btn" onclick="parseAndGenerate()">🚀 智能解析生成</button>
+            </form>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
+                <h3 style="color: #333; margin-bottom: 15px;">✏️ 手动输入</h3>
+                <div class="input-group">
+                    <label>品牌名:</label>
+                    <input type="text" id="brand" placeholder="品牌名">
+                </div>
+                <div class="input-group">
+                    <label>商品名:</label>
+                    <input type="text" id="productName" placeholder="商品名">
+                </div>
+                <div class="input-group">
+                    <label>日常价:</label>
+                    <input type="text" id="originalPrice" placeholder="原价">
+                </div>
+                <div class="input-group">
+                    <label>直播价:</label>
+                    <input type="text" id="livePrice" placeholder="直播价">
+                </div>
+                <div class="input-group">
+                    <label>优惠:</label>
+                    <input type="text" id="discount" placeholder="折扣">
+                </div>
+                <div class="input-group">
+                    <label>机制:</label>
+                    <input type="text" id="mechanism" placeholder="免单/置顶/秒杀">
+                </div>
+                <div class="input-group">
+                    <label>售后:</label>
+                    <input type="text" id="service" placeholder="运费险/七天无理由">
+                </div>
+                <div class="input-group">
+                    <label>库存:</label>
+                    <input type="text" id="inventory" placeholder="现货/预售">
+                </div>
+                <div class="input-group">
+                    <label>核心卖点:</label>
+                    <textarea id="highlights" placeholder="产品核心卖点和母婴建议"></textarea>
+                </div>
+                <button type="button" class="generate-btn" onclick="generateFromForm()">📝 手动生成</button>
+            </div>
+        </div>
+        
+        <!-- 手卡预览 -->
+        <div class="card-preview">
+            <h2>🎨 手卡预览</h2>
+            <div class="card" id="liveCard">
+                <!-- 顶部行 -->
+                <div class="top-row">
+                    <div class="brand-box">
+                        <div class="brand-label">品牌名</div>
+                        <input type="text" class="brand-text" id="editBrand" value="品牌名" />
+                    </div>
+                    <div class="product-box">
+                        <div class="product-label">商品名</div>
+                        <input type="text" class="product-text" id="editProductName" value="商品名" />
+                    </div>
+                </div>
+
+                <!-- 中间行 -->
+                <div class="middle-row">
+                    <div class="image-box">
+                        <div class="image-text">商品图片</div>
+                    </div>
+                    <div class="price-section">
+                        <div class="price-row">
+                            <div class="price-box">
+                                <div class="price-label original-price">日常价</div>
+                                <input type="text" class="price-value" id="editOriginalPrice" value="¥0" />
+                            </div>
+                            <div class="price-box">
+                                <div class="price-label live-price">直播价</div>
+                                <input type="text" class="price-value" id="editLivePrice" value="¥0" />
+                            </div>
+                            <div class="price-box">
+                                <div class="price-label discount">促销</div>
+                                <input type="text" class="price-value" id="editDiscount" value="无" />
+                            </div>
+                        </div>
+                        <div class="price-row">
+                            <div class="info-box">
+                                <div class="info-label mechanism">机制<br>(免单/置顶/秒杀)</div>
+                                <textarea class="info-text" id="editMechanism">无</textarea>
+                            </div>
+                            <div class="info-box">
+                                <div class="info-label service">售后<br>(运费险/7天无理由)</div>
+                                <textarea class="info-text" id="editService">标准售后</textarea>
+                            </div>
+                            <div class="info-box">
+                                <div class="info-label inventory">库存<br>(现货/预售)</div>
+                                <textarea class="info-text" id="editInventory">现货</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 核心卖点 -->
+                <div class="highlight-box">
+                    <div class="highlight-label">核心卖点/母婴建议</div>
+                    <textarea class="highlight-text" id="editHighlights">请输入产品核心卖点和母婴建议...</textarea>
+                </div>
+            </div>
+            
+            <button class="export-btn" onclick="exportCard()">💾 导出为图片</button>
+        </div>
+    </div>
+
+    <script>
+        // 智能解析商品信息
+        function parseAndGenerate() {
+            const productInfo = document.getElementById('productInfo').value.trim();
+            if (!productInfo) {
+                alert('请输入商品信息！');
+                return;
+            }
+
+            console.log('原始输入:', productInfo); // 调试用
+            
+            // 按空格分割，但保留后面的长描述
+            const parts = productInfo.split(' ');
+            console.log('分割后的部分:', parts); // 调试用
+            
+            let productName = '';
+            let brand = '';
+            let originalPrice = '';
+            let livePrice = '';
+            let discount = '';
+            let mechanism = '';
+            let service = '';
+            let description = '';
+            
+            // 根据您的格式：商品名 品牌 原价 现价 折扣% 机制 服务 描述
+            if (parts.length >= 7) {
+                productName = parts[0] || '';
+                brand = parts[1] || '';
+                
+                // 查找数字作为价格
+                const priceRegex = /^\d+(\.\d+)?$/;
+                let priceIndex = 2;
+                
+                // 原价
+                if (parts[priceIndex] && priceRegex.test(parts[priceIndex])) {
+                    originalPrice = parts[priceIndex];
+                    priceIndex++;
+                }
+                
+                // 现价
+                if (parts[priceIndex] && priceRegex.test(parts[priceIndex])) {
+                    livePrice = parts[priceIndex];
+                    priceIndex++;
+                }
+                
+                // 折扣
+                if (parts[priceIndex] && parts[priceIndex].includes('%')) {
+                    const discountMatch = parts[priceIndex].match(/(\d+)%/);
+                    if (discountMatch) {
+                        const discountPercent = parseInt(discountMatch[1]);
+                        // 25% 表示打75折
+                        discount = (100 - discountPercent) / 10 + '折';
+                    }
+                    priceIndex++;
+                }
+                
+                // 机制
+                if (parts[priceIndex]) {
+                    mechanism = parts[priceIndex];
+                    priceIndex++;
+                }
+                
+                // 服务 - 查找包含逗号的部分
+                let serviceIndex = priceIndex;
+                while (serviceIndex < parts.length) {
+                    if (parts[serviceIndex] && (parts[serviceIndex].includes('险') || parts[serviceIndex].includes('理由') || parts[serviceIndex].includes(','))) {
+                        service = parts[serviceIndex].replace(/,/g, '\n');
+                        serviceIndex++;
+                        break;
+                    }
+                    serviceIndex++;
+                }
+                
+                // 描述 - 剩余部分
+                if (serviceIndex < parts.length) {
+                    description = parts.slice(serviceIndex).join(' ');
+                }
+            }
+            
+            console.log('解析结果:', {
+                productName, brand, originalPrice, livePrice, 
+                discount, mechanism, service, description
+            }); // 调试用
+            
+            // 更新手卡
+            updateCard({
+                brand: brand || '品牌名',
+                productName: productName || '商品名',
+                originalPrice: originalPrice ? '¥' + originalPrice : '¥0',
+                livePrice: livePrice ? '¥' + livePrice : '¥0',
+                discount: discount || '无',
+                mechanism: mechanism || '无',
+                service: service || '标准售后',
+                inventory: '现货',
+                highlights: formatHighlights(description)
+            });
+        }
+        
+        // 格式化卖点描述
+        function formatHighlights(description) {
+            if (!description) return '请输入产品核心卖点和母婴建议...';
+            
+            // 按数字开头的句子分割
+            const sentences = description.split(/(?=\d+\.)/);
+            let formatted = '';
+            
+            sentences.forEach((sentence, index) => {
+                const trimmed = sentence.trim();
+                if (trimmed) {
+                    if (trimmed.match(/^\d+\./)) {
+                        // 已经有编号的句子
+                        formatted += `✨ ${trimmed}\n`;
+                    } else {
+                        // 没有编号的句子，添加表情符号
+                        formatted += `🎯 ${trimmed}\n`;
+                    }
+                }
+            });
+            
+            return formatted || description;
+        }
+        
+        // 手动生成
+        function generateFromForm() {
+            const data = {
+                brand: document.getElementById('brand').value || '品牌名',
+                productName: document.getElementById('productName').value || '商品名',
+                originalPrice: document.getElementById('originalPrice').value || '¥0',
+                livePrice: document.getElementById('livePrice').value || '¥0',
+                discount: document.getElementById('discount').value || '无',
+                mechanism: document.getElementById('mechanism').value || '无',
+                service: document.getElementById('service').value || '标准售后',
+                inventory: document.getElementById('inventory').value || '现货',
+                highlights: document.getElementById('highlights').value || '请输入产品核心卖点和母婴建议...'
+            };
+            
+            updateCard(data);
+        }
+        
+        // 更新手卡
+        function updateCard(data) {
+            document.getElementById('editBrand').value = data.brand;
+            document.getElementById('editProductName').value = data.productName;
+            document.getElementById('editOriginalPrice').value = data.originalPrice;
+            document.getElementById('editLivePrice').value = data.livePrice;
+            document.getElementById('editDiscount').value = data.discount;
+            document.getElementById('editMechanism').value = data.mechanism;
+            document.getElementById('editService').value = data.service;
+            document.getElementById('editInventory').value = data.inventory;
+            document.getElementById('editHighlights').value = data.highlights;
+        }
+        
+        // 导出功能（简化版，实际使用需要 html2canvas 库）
+        function exportCard() {
+            alert('导出功能需要集成 html2canvas 库。\n您可以右键点击手卡区域选择"保存图片"，或者截图保存。');
+        }
+        
+        // 自动调整文本框高度
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
